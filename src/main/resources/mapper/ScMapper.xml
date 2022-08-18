@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.crud.dao.ScMapper">
+  <resultMap id="BaseResultMap" type="com.atguigu.crud.bean.Sc">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="cid" jdbcType="CHAR" property="cid" />
+    <result column="sid" jdbcType="CHAR" property="sid" />
+  </resultMap>
+  <!-- 三表联查，可优化···· -->
+  <resultMap type="com.atguigu.crud.bean.StuSelectResult" id="resultListStuSelectResult">
+    <result column="courseclass" property="classr" />
+    <result column="coursetime" property="coursetime" />
+    <result column="courseweek" property="courseweek" />
+    <result column="cname" property="cname" />
+    <result column="classroom" property="classroom" />
+    <result column="credits" property="credits" />
+    <result column="period" property="period" />
+    <result column="tname" property="tname" />
+  </resultMap>
+  <!-- 双表查询 -->
+  <resultMap type="com.atguigu.crud.bean.StuExitSelect" id="resultListStuExitSelect">
+    <result column="cid" property="cid" />
+    <result column="Cname" property="cname" />
+    <result column="sid" property="sid" />
+    <result column="totalNum" property="totalNum" />
+    <result column="stuSum" property="stuSum" />
+  </resultMap>
+
+  <!-- 学生 -->
+  <resultMap type="com.atguigu.crud.bean.Student" id="resultListStudent">
+    <result column="sid" property="sid" />
+    <result column="sname" property="sname" />
+    <result column="sidcard" property="sidcard" />
+    <result column="ssex" property="ssex" />
+    <result column="spassword" property="spassword" />
+    <result column="sage" property="sage" />
+    <result column="classr" property="classr" />
+    <result column="profession" property="profession" />
+    <result column="college" property="college" />
+  </resultMap>
+
+  <!-- 选课 -->
+  <insert id="selectCourse">
+		insert into sc(cid,sid)
+		value (#{cid}, #{sid})
+	</insert>
+
+  <!-- 判断是否加入过此课程 -->
+  <select id="existCourse" resultType="java.lang.String">
+        select * from sc where sid = #{sid} and cid = #{cid}
+    </select>
+
+  <!-- 查询全部 -->
+  <select id="getAllSC" parameterType="map" resultMap="BaseResultMap">
+    select * from sc where sid = #{sid} <!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 根据课程编号查询课程选课信息 -->
+  <select id="getSCByCid" parameterType="map" resultMap="BaseResultMap">
+    select * from sc where cid = #{cid} <!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 根据学号查询本人已选课程，可优化···· -->
+  <select id="getSCBySid" parameterType="map" resultMap="resultListStuSelectResult">
+    select courseplan.courseclass,course.cname,courseplan.courseclass,courseplan.coursetime,courseplan.courseweek,
+    courseplan.classroom,courseplan.credits,courseplan.period,teacher.tname
+    from sc,courseplan,course,teacher where sc.cid =courseplan.cid and sc.cid = course.cid  and courseplan.tid= teacher.tid and sc.sid= #{sid}
+    <!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 根据学号退选（待确定··） -->
+  <select id="getExitBysid" parameterType="map" resultMap="resultListStuExitSelect">
+    select cname,sc.cid,sid from course,sc where sc.cid=course.cid and sid = #{sid} <!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 退选 -->
+  <delete id="deleteSC" parameterType="String">
+		delete from sc where cid = #{cid} and sid = #{sid}
+	</delete>
+
+  <!-- 查看课程已选人数 -->
+  <select id="getLookByTid" parameterType="map" resultMap="resultListStuExitSelect">
+    select cname,courseplan.cid,tid,Totalnum,(SELECT count(*) FROM sc where cid = courseplan.cid) stuSum
+    from course,courseplan where courseplan.cid=course.cid and courseplan.tid = #{tid} <!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 查看课程的学生详细信息 -->
+  <select id="getByStuSid" parameterType="map" resultMap="resultListStudent">
+    SELECT s.`Sid`,s.`Sname`,s.`Ssex`,s.`Classr`,s.`profession`,s.`college` FROM student s,sc,courseplan WHERE s.sid=sc.sid AND sc.cid = #{cid} AND sc.`cid`=courseplan.`cid`<!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from sc
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.atguigu.crud.bean.Sc">
+    insert into sc (id, cid, sid)
+    values (#{id,jdbcType=INTEGER}, #{cid,jdbcType=CHAR}, #{sid,jdbcType=CHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.atguigu.crud.bean.Sc">
+    update sc
+    set cid = #{cid,jdbcType=CHAR},
+      sid = #{sid,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, cid, sid
+    from sc
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, cid, sid
+    from sc
+  </select>
+</mapper>

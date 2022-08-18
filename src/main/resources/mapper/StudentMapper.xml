@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.crud.dao.StudentMapper">
+  <resultMap id="BaseResultMap" type="com.atguigu.crud.bean.Student">
+    <id column="Sid" jdbcType="CHAR" property="sid" />
+    <result column="Sname" jdbcType="VARCHAR" property="sname" />
+    <result column="Sidcard" jdbcType="CHAR" property="sidcard" />
+    <result column="Ssex" jdbcType="VARCHAR" property="ssex" />
+    <result column="Spassword" jdbcType="VARCHAR" property="spassword" />
+    <result column="Sage" jdbcType="CHAR" property="sage" />
+    <result column="Classr" jdbcType="VARCHAR" property="classr" />
+    <result column="profession" jdbcType="VARCHAR" property="profession" />
+    <result column="college" jdbcType="VARCHAR" property="college" />
+  </resultMap>
+  <!-- 根据学号删除学生信息 -->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from student
+    where Sid = #{sid,jdbcType=CHAR}
+  </delete>
+  <!-- 添加学生信息 -->
+  <insert id="insert" parameterType="com.atguigu.crud.bean.Student">
+    insert into student (Sid, Sname, Sidcard, 
+      Ssex, Spassword, Sage, 
+      Classr, profession, college
+      )
+    values (#{sid,jdbcType=CHAR}, #{sname,jdbcType=VARCHAR}, #{sidcard,jdbcType=CHAR}, 
+      #{ssex,jdbcType=VARCHAR}, #{spassword,jdbcType=VARCHAR}, #{sage,jdbcType=CHAR}, 
+      #{classr,jdbcType=VARCHAR}, #{profession,jdbcType=VARCHAR}, #{college,jdbcType=VARCHAR}
+      )
+  </insert>
+  <!-- 根据学号修改学生信息 -->
+  <update id="updateByPrimaryKey" parameterType="com.atguigu.crud.bean.Student">
+    update student
+    set Sname = #{sname,jdbcType=VARCHAR},
+      Sidcard = #{sidcard,jdbcType=CHAR},
+      Ssex = #{ssex,jdbcType=VARCHAR},
+      Spassword = #{spassword,jdbcType=VARCHAR},
+      Sage = #{sage,jdbcType=CHAR},
+      Classr = #{classr,jdbcType=VARCHAR},
+      profession = #{profession,jdbcType=VARCHAR},
+      college = #{college,jdbcType=VARCHAR}
+    where Sid = #{sid,jdbcType=CHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select Sid, Sname, Sidcard, Ssex, Spassword, Sage, Classr, profession, college
+    from student
+    where Sid = #{sid,jdbcType=CHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select Sid, Sname, Sidcard, Ssex, Spassword, Sage, Classr, profession, college
+    from student
+  </select>
+  <!-- 修改学生密码 -->
+  <update id="modifyStudentPwd">
+		update student set spassword=#{spassword} where sid =#{sid}
+	</update>
+
+  <!-- 根据学号查询出学生实体 -->
+  <select id="getByStuSid" parameterType="String" resultType="com.atguigu.crud.bean.Student">
+		SELECT * from student where sid = #{sid}
+	</select>
+
+  <!-- 学生登录设置 -->
+  <select id="queryByNamePwd" resultType="java.lang.String">
+		select * from student where sid = #{sid} and spassword= #{spassword}
+	</select>
+
+  <!-- 查询全部学生 -->
+  <select id="selectStudentBySql" parameterType="map" resultMap="BaseResultMap">
+    select * from student <!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 根据学号查询学生信息 -->
+  <select id="getByStudentSid" parameterType="map" resultMap="BaseResultMap">
+    select * from student where sid = #{sid} <!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 根据学院查询学生信息 -->
+  <select id="getByStudentCol" parameterType="map" resultMap="BaseResultMap">
+    select * from student where college = #{college} <!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 根据专业查询学生信息 -->
+  <select id="getByStudentPro" parameterType="map" resultMap="BaseResultMap">
+    select * from student where profession = #{profession} <!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 根据班级查询学生信息 -->
+  <select id="getByStudentCla" parameterType="map" resultMap="BaseResultMap">
+    select * from student where classr = #{classr} <!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- ajax验证学号是否存在 -->
+  <select id="ajaxQueryBySid" resultType="java.lang.String">
+		select sid from student where sid = #{sid}
+	</select>
+
+</mapper>

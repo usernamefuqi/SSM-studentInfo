@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.crud.dao.CourseMapper">
+  <resultMap id="BaseResultMap" type="com.atguigu.crud.bean.Course">
+    <id column="Cid" jdbcType="CHAR" property="cid" />
+    <result column="Cname" jdbcType="VARCHAR" property="cname" />
+    <result column="Cintroduction" jdbcType="VARCHAR" property="cintroduction" />
+    <result column="Type" jdbcType="VARCHAR" property="type" />
+    <result column="belongcoll" jdbcType="VARCHAR" property="belongcoll" />
+    <result column="belongpro" jdbcType="VARCHAR" property="belongpro" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from course
+    where Cid = #{cid,jdbcType=CHAR}
+  </delete>
+  <insert id="insert" parameterType="com.atguigu.crud.bean.Course">
+    insert into course (Cid, Cname, Cintroduction, 
+      Type, belongcoll, belongpro
+      )
+    values (#{cid,jdbcType=CHAR}, #{cname,jdbcType=VARCHAR}, #{cintroduction,jdbcType=VARCHAR}, 
+      #{type,jdbcType=VARCHAR}, #{belongcoll,jdbcType=VARCHAR}, #{belongpro,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.atguigu.crud.bean.Course">
+    update course
+    set Cname = #{cname,jdbcType=VARCHAR},
+      Cintroduction = #{cintroduction,jdbcType=VARCHAR},
+      Type = #{type,jdbcType=VARCHAR},
+      belongcoll = #{belongcoll,jdbcType=VARCHAR},
+      belongpro = #{belongpro,jdbcType=VARCHAR}
+    where Cid = #{cid,jdbcType=CHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select Cid, Cname, Cintroduction, Type, belongcoll, belongpro
+    from course
+    where Cid = #{cid,jdbcType=CHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select Cid, Cname, Cintroduction, Type, belongcoll, belongpro
+    from course
+  </select>
+  <!-- 根据课程编号查询出课程实体 -->
+  <select id="getByCouCid" parameterType="String" resultType="com.atguigu.crud.bean.Course">
+		SELECT * from course c where c.cid = #{cid} and not exists(select 1 from grade g where g.cid=c.cid )
+	</select>
+
+  <!-- 查询全部课程 -->
+  <select id="selectCourseBySql" parameterType="map" resultMap="BaseResultMap">
+    select * from course c where not exists(select 1 from grade g where g.cid=c.cid )<!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 根据课程编号查询课程信息 -->
+  <select id="getByCourseCid" parameterType="map" resultMap="BaseResultMap">
+    select * from course c where c.cid = #{cid} and not exists(select 1 from grade g where g.cid=c.cid )<!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 根据课程名称查询课程信息 -->
+  <select id="getByCourseCname" parameterType="map" resultMap="BaseResultMap">
+    select * from course c where c.cname = #{cname} and not exists(select 1 from grade g where g.cid=c.cid )<!--  limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 根据学院查询学生信息 -->
+  <select id="getByCourseCol" parameterType="map" resultMap="BaseResultMap">
+    select * from course c where c.belongcoll = #{belongcoll} and not exists(select 1 from grade g where g.cid=c.cid ) <!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- 根据课程类型查询学生信息 -->
+  <select id="getByCourseType" parameterType="map" resultMap="BaseResultMap">
+    select * from course c where c.type = #{type} and not exists(select 1 from grade g where g.cid=c.cid )<!-- limit #{pageNo} , #{pageSize} -->
+  </select>
+
+  <!-- ajax验证课程编号是否存在 -->
+  <select id="ajaxQueryByCid" resultType="java.lang.String">
+		select cid from course where cid = #{cid}
+	</select>
+</mapper>
